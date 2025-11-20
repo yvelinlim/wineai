@@ -45,7 +45,7 @@ async def wine_ai(
             "pairings": pairings
         }
 
-        return templates.TemplateResponse("index.html", {"request": {}, "result": result})
+        return templates.TemplateResponse("index.html", {"request": request, "result": result})
 
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=500)
