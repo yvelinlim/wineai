@@ -3,6 +3,11 @@ from fastapi.responses import JSONResponse
 
 app = FastAPI()
 
+# Root route for friendly message
+@app.get("/")
+def root():
+    return {"message": "Wine AI API is running. Use POST /wine_ai to get recommendations."}
+
 @app.post("/wine_ai")
 async def wine_ai(request: Request):
     """
