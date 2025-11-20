@@ -15,10 +15,12 @@ def home(request: Request):
 
 @app.post("/wine_ai")
 async def wine_ai(
+    request: Request,  # <-- required for TemplateResponse
     guests: int = Form(...),
     duration: int = Form(...),
     budget: float = Form(...),
     menu: str = Form("beef,chicken")
+
 ):
     try:
         menu_items = [item.strip() for item in menu.split(",")]
