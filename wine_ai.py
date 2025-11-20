@@ -1,37 +1,27 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Request, Form
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
 app = FastAPI()
 
+# Templates folder
+templates = Jinja2Templates(directory="templates")
+
 # Root route for friendly message
-@app.get("/")
-def root():
-    return {"message": "Wine AI API is running. Use POST /wine_ai to get recommendations."}
+@app.get("/", response_class=HTMLResponse)
+def home(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 @app.post("/wine_ai")
-async def wine_ai(request: Request):
-    """
-    Input JSON:
-    {
-        "guests": int,
-        "duration": int,
-        "budget": float,
-        "menu": ["beef", "chicken"] (optional)
-    }
-    Output JSON:
-    {
-        "wine_bottles": int,
-        "beer_liters": float,
-        "liquor_liters": float,
-        "pairings": ["Red wine with beef", ...]
-    }
-    """
+async def wine_ai(
+    guests: int = Form(...),
+    duration: int = Form(...),
+    budget: float = Form(...),
+    menu: str = Form("beef,chicken")
+):
     try:
-        data = await request.json()
-        guests = int(data.get("guests", 50))
-        duration = int(data.get("duration", 4))
-        budget = float(data.get("budget", 500))
-        menu = data.get("menu", ["beef", "chicken"])
+        menu_items = [item.strip() for item in menu.split(",")]
 
         # Estimate drinks
         wine_bottles = round(0.5 * guests * duration / 4)
@@ -46,7 +36,7 @@ async def wine_ai(request: Request):
             "vegetarian": "Rosé wine",
             "dessert": "Sweet wine"
         }
-        pairings = [f"{pairings_map.get(item.lower(),'Red wine')} with {item}" for item in menu]
+        pairings = [f"{pairings_map.get(item.lower(),'Red wine')} with {item}" for item in menu_items]
 
         result = {
             "wine_bottles": wine_bottles,
@@ -55,7 +45,7 @@ async def wine_ai(request: Request):
             "pairings": pairings
         }
 
-        return JSONResponse({"result": result})
+        return templates.TemplateResponse("index.html", {"request": {}, "result": result})
 
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=500)

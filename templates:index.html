@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Wine AI Planner</title>
+</head>
+<body>
+    <h1>Wine AI Planner</h1>
+    <form method="post" action="/wine_ai">
+        <label>Number of Guests:</label><br>
+        <input type="number" name="guests" required><br><br>
+
+        <label>Duration (hours):</label><br>
+        <input type="number" name="duration" required><br><br>
+
+        <label>Budget ($):</label><br>
+        <input type="number" name="budget" required><br><br>
+
+        <label>Menu items (comma separated):</label><br>
+        <input type="text" name="menu" placeholder="beef,chicken"><br><br>
+
+        <button type="submit">Calculate</button>
+    </form>
+
+    {% if result %}
+    <h2>Results:</h2>
+    <ul>
+        <li>Wine bottles: {{ result['wine_bottles'] }}</li>
+        <li>Beer liters: {{ result['beer_liters'] }}</li>
+        <li>Liquor liters: {{ result['liquor_liters'] }}</li>
+        <li>Pairings:
+            <ul>
+            {% for p in result['pairings'] %}
+                <li>{{ p }}</li>
+            {% endfor %}
+            </ul>
+        </li>
+    </ul>
+    {% endif %}
+</body>
+</html>
